@@ -1,5 +1,7 @@
 import chartify
 
+
+#Hey all, if you're reading this, please make your own testing file so we can have many files to look back on.
 data = chartify.examples.example_data()
 #print(data.head())
 
