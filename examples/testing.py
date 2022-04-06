@@ -1,7 +1,6 @@
 import chartify
 import numpy as np
 import pandas as pd
-s
 
 import matplotlib.pyplot as plt
 #Hey all, if you're reading this, please make your own testing file so we can have many files to look back on.
