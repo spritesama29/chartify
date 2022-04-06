@@ -20,4 +20,4 @@ jobs:
         pip install pylint
     - name: autoTests with pytest
       run: |
-        python -m pytest tests/*
+        python -m pytest autoTests/*
