@@ -21,8 +21,7 @@ Module for chart plots.
 import bokeh
 import pandas as pd
 import numpy as np
-from bokeh.plotting import figure
-
+import matplotlib.pyplot as plt
 from chartify._core.colors import Color, color_palettes
 from chartify._core.axes import NumericalYMixin, NumericalXMixin
 
@@ -41,7 +40,7 @@ class BasePlot:
         difference = abs(max_value - min_value)
         precision = abs(int(np.floor(
             np.log10(difference if difference else 1)))) + 1
-        zeros = ''.join(['0'] * precision)
+        zeros = ''.join(['0']*precision)
         return "0,0.[{}]".format(zeros)
 
     @classmethod
@@ -50,7 +49,7 @@ class BasePlot:
             return PlotCategoricalXY
         elif x_axis_type not in ('categorical',
                                  'density') and y_axis_type not in (
-            'categorical', 'density'):
+                                     'categorical', 'density'):
             return PlotNumericXY
         elif x_axis_type == 'density' and y_axis_type == 'density':
             return PlotDensityXY
@@ -82,7 +81,7 @@ class BasePlot:
             else:
                 # Check that all color factors are present in the color order.
                 if not set(data_frame[color_column].unique()).issubset(
-                    set(color_order)):
+                        set(color_order)):
                     raise ValueError("""Color order must include
                                      all unique factors of variable `%s`.""" %
                                      color_column)
@@ -186,7 +185,7 @@ class BasePlot:
             self._chart.axes.set_xaxis_tick_format(
                 self._axis_format_precision(max_x_value,
                                             min_x_value)
-            )
+                )
 
         if isinstance(self._chart.axes, NumericalYMixin):
             max_y_value = data_frame[y_column].max()
@@ -195,7 +194,7 @@ class BasePlot:
             self._chart.axes.set_yaxis_tick_format(
                 self._axis_format_precision(max_y_value,
                                             min_y_value)
-            )
+                )
 
 
 class PlotCategoricalXY(BasePlot):
@@ -365,8 +364,8 @@ class PlotNumericXY(BasePlot):
             sliced_data = (
                 sliced_data[
                     [col for col in sliced_data.columns
-                     if col in (
-                         x_column, y_column, color_column)]])
+                        if col in (
+                            x_column, y_column, color_column)]])
 
             cast_data = self._cast_datetime_axis(sliced_data, x_column)
 
@@ -389,7 +388,7 @@ class PlotNumericXY(BasePlot):
                 line_dash=line_dash,
                 alpha=alpha,
                 y_range_name=self._y_range_name
-            )
+                )
 
         # Set legend defaults if there are multiple series.
         if color_column is not None:
@@ -444,8 +443,8 @@ class PlotNumericXY(BasePlot):
             sliced_data = (
                 sliced_data[
                     [col for col in sliced_data.columns
-                     if col in (
-                         x_column, y_column, size_column, color_column)]])
+                        if col in (
+                            x_column, y_column, size_column, color_column)]])
             cast_data = self._cast_datetime_axis(sliced_data, x_column)
 
             source = self._named_column_data_source(
@@ -529,8 +528,8 @@ class PlotNumericXY(BasePlot):
             sliced_data = (
                 sliced_data[
                     [col for col in sliced_data.columns
-                     if col in (
-                         x_column, y_column, text_column, color_column)]])
+                        if col in (
+                            x_column, y_column, text_column, color_column)]])
             cast_data = self._cast_datetime_axis(sliced_data, x_column)
 
             source = self._named_column_data_source(
@@ -598,8 +597,8 @@ class PlotNumericXY(BasePlot):
                         [data_frame[x_column].unique(),
                          data_frame[color_column].unique()],
                         names=[x_column, color_column]))
-                    .reset_index(drop=False)
-                    .fillna(0))
+                .reset_index(drop=False)
+                .fillna(0))
 
         if second_y_column is None and color_column is not None:
             last_y = np.zeros(data_frame.groupby(color_column).size().iloc[0])
@@ -656,7 +655,7 @@ class PlotNumericXY(BasePlot):
                     source=source,
                     color=color,
                     y_range_name=self._y_range_name
-                )
+                    )
 
             else:
                 self._plot_with_legend(
@@ -668,7 +667,7 @@ class PlotNumericXY(BasePlot):
                     source=source,
                     color=color,
                     y_range_name=self._y_range_name
-                )
+                    )
 
         # Set legend defaults if there are multiple series.
         if color_column is not None:
@@ -694,14 +693,20 @@ class PlotNumericDensityXY(BasePlot):
     #     ]
     #     return sorted((set(dir(self.__class__)) | set(self.__dict__.keys())) -
     #                   set(inherited_public_methods))
+    def box(self,data_frame):
+        np.random.seed(1234)
+
+        boxplot = data_frame.boxplot(column=['Col1', 'Col2', 'Col3'])
+        self._chart = boxplot
+        return self._chart
 
     def histCumu(self,
-                 data_frame,
-                 values_column,
-                 color_column=None,
-                 color_order=None,
-                 method='count',
-                 bins='auto'):
+                  data_frame,
+                  values_column,
+                  color_column=None,
+                  color_order=None,
+                  method='count',
+                  bins='auto'):
         """Histogram.
 
         Args:
@@ -792,7 +797,7 @@ class PlotNumericDensityXY(BasePlot):
                     fill_color=color,
                     line_color=color,
                     alpha=.3
-                )
+                    )
 
             else:
                 self._plot_with_legend(
@@ -806,7 +811,7 @@ class PlotNumericDensityXY(BasePlot):
                     fill_color=color,
                     line_color=color,
                     alpha=.3,
-                )
+                    )
 
         # Set legend defaults if there are multiple series.
         if color_column is not None:
@@ -1050,66 +1055,9 @@ class PlotDensityXY(BasePlot):
             aspect_scale=aspect_scale,
             palette=color_palette,
             line_color='white'
-        )
+            )
 
         return self._chart
-
-
-def box_and_whiskers(name,
-                     number,
-                     ):
-    # generate some synthetic time series for six different categories
-    data_name = list(name)
-    data_values = int(number)
-    yy = np.random.randn(data_values)
-    g = np.random.choice(data_name, data_values)
-    for i, l in enumerate(data_name):
-        yy[g == l] += i // 2
-    df = pd.DataFrame(dict(score=yy, group=g))
-
-    # find the quartiles and IQR for each category
-    groups = df.groupby('group')
-    q1 = groups.quantile(.25)
-    q2 = groups.quantile(0.5)
-    q3 = groups.quantile(0.75)
-    iqr = q3 - q1
-    upper = q3 + 1.5 * iqr
-    lower = q1 - 1.5 * iqr
-
-    # find the outliers for each category
-    def outliers(group):
-        data = group.name
-        return group[(group.score > upper.loc[data]['score']) | (group.score < lower.loc[data]['score'])]['score']
-
-    out = groups.apply(outliers).dropna()
-
-    # prepare outlier data for plotting, we need coordinates for every outlier.
-    if not out.empty:
-        outx = list(out.index.get_level_values(0))
-        outy = list(out.values)
-
-    p = figure(tools="", background_fill_color="#efefef", x_range=data_name, toolbar_location=None)
-
-    # stems
-    p.segment(data_name, upper.score, data_name, q3.score, line_color="black")
-    p.segment(data_name, lower.score, data_name, q1.score, line_color="black")
-
-    # boxes
-    p.vbar(data_name, 0.7, q2.score, q3.score, fill_color="#E08E79", line_color="black")
-    p.vbar(data_name, 0.7, q1.score, q2.score, fill_color="#3B8686", line_color="black")
-
-    # whiskers (almost-0 height rects simpler than segments)
-    p.rect(data_name, lower.score, 0.2, 0.01, line_color="black")
-    p.rect(data_name, upper.score, 0.2, 0.01, line_color="black")
-
-    # outliers
-    if not out.empty:
-        p.circle(outx, outy, size=6, color="#F38630", fill_alpha=0.6)
-
-    p.xgrid.grid_line_color = None
-    p.ygrid.grid_line_color = "white"
-    p.grid.grid_line_width = 2
-    p.xaxis.major_label_text_font_size = "16px"
 
 
 class PlotMixedTypeXY(BasePlot):
@@ -1471,7 +1419,7 @@ class PlotMixedTypeXY(BasePlot):
                 # If stack order is set then
                 # make sure it includes all the levels.
                 if not set(data_frame[stack_column].unique()).issubset(
-                    set(stack_order)):
+                        set(stack_order)):
                     raise ValueError("""Color order must include
                                     all unique factors of variable `%s`.""" %
                                      stack_order)
@@ -1518,7 +1466,7 @@ class PlotMixedTypeXY(BasePlot):
                     cumulative_numeric_value
                     + source.data[color_value]
                     * .5
-                )
+                    )
             else:
                 cumulative_numeric_value = source.data[color_value] * .5
 
@@ -1620,7 +1568,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color='white',
                 source=source,
                 fill_color=colors,
-            )
+                )
 
         else:
 
@@ -1634,7 +1582,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color='white',
                 source=source,
                 fill_color=colors,
-            )
+                )
 
         # Set legend defaults if there are multiple series.
         if color_column is not None:
@@ -1696,12 +1644,12 @@ class PlotMixedTypeXY(BasePlot):
             self._chart.axes.set_yaxis_tick_format(
                 self._axis_format_precision(max_value,
                                             min_value)
-            )
+                )
         else:
             self._chart.axes.set_xaxis_tick_format(
                 self._axis_format_precision(max_value,
                                             min_value)
-            )
+                )
 
         interval_settings = self._chart.style._get_settings('interval_plot')
         SPACE_BETWEEN_BARS = interval_settings['space_between_bars']
@@ -1718,9 +1666,9 @@ class PlotMixedTypeXY(BasePlot):
             bar_num = index + 1
             start = (
                 bar_num * MARGIN + (bar_num - 1) * MARGIN + (bar_num - 1) *
-                BAR_WIDTH + (SPACE_BETWEEN_BARS - INTERVAL_MIDPOINT_STEM_SIZE ** bar_num) +
+                (BAR_WIDTH) + SPACE_BETWEEN_BARS * (bar_num - 1) +
                 SPACE_BETWEEN_CATEGORIES * (category_number - 1))
-            midpoint = start + BAR_WIDTH / 2
+            midpoint = start + BAR_WIDTH / 2.
             end = start + BAR_WIDTH
             return (start, midpoint, end)
 
@@ -1899,7 +1847,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color='white',
                 source=source,
                 fill_color=colors,
-            )
+                )
 
         else:
             self._plot_with_legend(
@@ -1911,7 +1859,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color='white',
                 source=source,
                 fill_color=colors,
-            )
+                )
 
         self._chart.style._apply_settings('legend')
         # Reverse order of vertical legends to ensure that the order
@@ -1998,7 +1946,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color=colors,
                 line_width=3,
                 source=source,
-            )
+                )
 
         else:
             self._chart.figure.segment(
@@ -2020,7 +1968,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color=colors,
                 line_width=3,
                 source=source,
-            )
+                )
 
         # Set legend defaults if there are multiple series.
         if color_column is not None:
@@ -2206,8 +2154,8 @@ class PlotMixedTypeXY(BasePlot):
             sliced_data = (
                 sliced_data[
                     [col for col in sliced_data.columns
-                     if col in (
-                         numeric_column, size_column)]])
+                        if col in (
+                            numeric_column, size_column)]])
             source = self._named_column_data_source(
                 sliced_data, series_name=color_value)
             source.add(data_factors, 'factors')
@@ -2228,87 +2176,10 @@ class PlotMixedTypeXY(BasePlot):
                 source=source,
                 marker=marker,
                 alpha=alpha
-            )
+                )
 
         # Set legend defaults if there are multiple series.
         if color_column is not None:
             self._chart.style._apply_settings('legend')
 
         return self._chart
-
-    '''
-    def box_and_whiskers(self,
-                         name,
-                         number):
-        # generate some synthetic time series for six different categories
-        data_name = list(name)
-        data_values = int(number)
-        yy = np.random.randn(data_values)
-        g = np.random.choice(data_name, data_values)
-        for i, l in enumerate(data_name):
-            yy[g == l] += i // 2
-        df = pd.DataFrame(dict(score=yy, group=g))
-
-        # find the quartiles and IQR for each category
-        groups = df.groupby('group')
-        q1 = groups.quantile(.25)
-        q2 = groups.quantile(0.5)
-        q3 = groups.quantile(0.75)
-        iqr = q3 - q1
-        upper = q3 + 1.5 * iqr
-        lower = q1 - 1.5 * iqr
-
-        # find the outliers for each category
-        def outliers(group):
-            data = group.name
-            return group[(group.score > upper.loc[data]['score']) | (group.score < lower.loc[data]['score'])]['score']
-
-        out = groups.apply(outliers).dropna()
-
-        # prepare outlier data for plotting, we need coordinates for every outlier.
-        if not out.empty:
-            outx = list(out.index.get_level_values(0))
-            outy = list(out.values)
-
-        p = figure(tools="", background_fill_color="#efefef", x_range=data_name, toolbar_location=None)
-
-        # stems
-        p.segment(data_name, upper.score, data_name, q3.score, line_color="black")
-        p.segment(data_name, lower.score, data_name, q1.score, line_color="black")
-
-        # boxes
-        p.vbar(data_name, 0.7, q2.score, q3.score, fill_color="#E08E79", line_color="black")
-        p.vbar(data_name, 0.7, q1.score, q2.score, fill_color="#3B8686", line_color="black")
-
-        # whiskers (almost-0 height rects simpler than segments)
-        p.rect(data_name, lower.score, 0.2, 0.01, line_color="black")
-        p.rect(data_name, upper.score, 0.2, 0.01, line_color="black")
-
-        # outliers
-        if not out.empty:
-            p.circle(outx, outy, size=6, color="#F38630", fill_alpha=0.6)
-
-        p.xgrid.grid_line_color = None
-        p.ygrid.grid_line_color = "white"
-        p.grid.grid_line_width = 2
-        p.xaxis.major_label_text_font_size = "16px"
-
-    self._plot_with_legend(
-        self._chart.figure.box_and_whiskers,
-        legend_label=legend,
-        x=x_value,
-        y=y_value,
-        size=size_column,
-        fill_color=color,
-        line_color=color,
-        source=source,
-        marker=marker,
-        alpha=alpha
-    )
-
-    # Set legend defaults if there are multiple series.
-    if color_column is not None:
-        self._chart.style._apply_settings('legend')
-
-    return self._chart
-'''
