@@ -21,7 +21,6 @@ Module for chart plots.
 import bokeh
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from chartify._core.colors import Color, color_palettes
 from chartify._core.axes import NumericalYMixin, NumericalXMixin
 
@@ -693,12 +692,6 @@ class PlotNumericDensityXY(BasePlot):
     #     ]
     #     return sorted((set(dir(self.__class__)) | set(self.__dict__.keys())) -
     #                   set(inherited_public_methods))
-    def box(self,data_frame):
-        np.random.seed(1234)
-
-        boxplot = data_frame.boxplot(column=['Col1', 'Col2', 'Col3'])
-        self._chart = boxplot
-        return self._chart
 
     def histCumu(self,
                   data_frame,
@@ -1666,7 +1659,7 @@ class PlotMixedTypeXY(BasePlot):
             bar_num = index + 1
             start = (
                 bar_num * MARGIN + (bar_num - 1) * MARGIN + (bar_num - 1) *
-                (BAR_WIDTH) + SPACE_BETWEEN_BARS * (bar_num - 1) +
+                (BAR_WIDTH) + (SPACE_BETWEEN_BARS - INTERVAL_MIDPOINT_STEM_SIZE ** bar_num*bar_num) +
                 SPACE_BETWEEN_CATEGORIES * (category_number - 1))
             midpoint = start + BAR_WIDTH / 2.
             end = start + BAR_WIDTH
