@@ -24,7 +24,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chartify._core.colors import Color, color_palettes
 from chartify._core.axes import NumericalYMixin, NumericalXMixin
-
+from bokeh.plotting import figure, show
 from scipy.stats.kde import gaussian_kde
 
 
@@ -676,6 +676,8 @@ class PlotNumericXY(BasePlot):
         return self._chart
 
 
+
+
 class PlotNumericDensityXY(BasePlot):
     """Plot functions for single density:
 
@@ -693,13 +695,68 @@ class PlotNumericDensityXY(BasePlot):
     #     ]
     #     return sorted((set(dir(self.__class__)) | set(self.__dict__.keys())) -
     #                   set(inherited_public_methods))
-    def box(self,data_frame):
-        np.random.seed(1234)
 
-        boxplot = data_frame.boxplot(column=['Col1', 'Col2', 'Col3'])
-        self._chart = boxplot
+    def boxTime(self):
+        # generate some synthetic time   series for six different categories
+        column = list("abcdef")
+        yy = np.random.randn(2000)
+        g = np.random.choice(column, 2000)
+        for i, l in enumerate(column):
+            yy[g == l] += i // 2
+        df = pd.DataFrame(dict(score=yy, group=g))
+
+        # find the quartiles and IQR for each category
+        groups = df.groupby('group')
+        q1 = groups.quantile(q=0.25)
+        q2 = groups.quantile(q=0.5)
+        q3 = groups.quantile(q=0.75)
+        iqr = q3 - q1
+        upper = q3 + 1.5 * iqr
+        lower = q1 - 1.5 * iqr
+
+        # find the outliers for each category
+        def outliers(group):
+            cat = group.name
+            return group[(group.score > upper.loc[cat]['score']) | (group.score < lower.loc[cat]['score'])]['score']
+
+        out = groups.apply(outliers).dropna()
+
+        # prepare outlier data for plotting, we need coordinates for every outlier.
+        if not out.empty:
+            outx = list(out.index.get_level_values(0))
+            outy = list(out.values)
+
+        p = figure(tools="", background_fill_color="#efefef", x_range=column, toolbar_location=None)
+
+        # if no outliers, shrink lengths of stems to be no longer than the minimums or maximums
+        qmin = groups.quantile(q=0.00)
+        qmax = groups.quantile(q=1.00)
+        upper.score = [min([x, y]) for (x, y) in zip(list(qmax.loc[:, 'score']), upper.score)]
+        lower.score = [max([x, y]) for (x, y) in zip(list(qmin.loc[:, 'score']), lower.score)]
+
+        # stems
+        p.segment(column, upper.score, column, q3.score, line_color="black")
+        p.segment(column, lower.score, column, q1.score, line_color="black")
+
+        # boxes
+        p.vbar(column, 0.7, q2.score, q3.score, fill_color="#E08E79", line_color="black")
+        p.vbar(column, 0.7, q1.score, q2.score, fill_color="#3B8686", line_color="black")
+
+        # whiskers (almost-0 height rects simpler than segments)
+        p.rect(column, lower.score, 0.2, 0.01, line_color="black")
+        p.rect(column, upper.score, 0.2, 0.01, line_color="black")
+
+        # outliers
+        if not out.empty:
+            p.circle(outx, outy, size=6, color="#F38630", fill_alpha=0.6)
+
+        p.xgrid.grid_line_color = None
+        p.ygrid.grid_line_color = "white"
+        p.grid.grid_line_width = 2
+        p.xaxis.major_label_text_font_size = "16px"
+        vertical = self._chart.axes._vertical
+
         return self._chart
-
     def histCumu(self,
                   data_frame,
                   values_column,
@@ -769,6 +826,9 @@ class PlotNumericDensityXY(BasePlot):
 
             density = True if method == 'density' else False
             hist, edges = np.histogram(sliced_data, density=density, bins=bins)
+
+            #Added the cumsum
+
             hist = np.cumsum(hist)
             if method == 'mass':
                 hist = hist * 1.0 / hist.sum()
@@ -1531,7 +1591,11 @@ class PlotMixedTypeXY(BasePlot):
                 categorical axis. Default False.
         """
         vertical = self._chart.axes._vertical
-
+        axesList = list(data_frame)
+        bruh2 = data_frame.get(axesList[0])[1]
+        print(bruh2)
+        if len(bruh2)>5:
+            data_frame.loc[0,axesList[0]]="MoonVeil\nKatana"
         source, factors, _ = self._construct_source(
             data_frame,
             categorical_columns,

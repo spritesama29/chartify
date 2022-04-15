@@ -35,6 +35,7 @@ from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+import chartify._core.plot
 from chartify._core.style import Style
 from chartify._core.axes import BaseAxes, SecondYNumericalAxis, SecondAxis
 from chartify._core.plot import BasePlot
@@ -91,8 +92,10 @@ class Chart:
         valid_x_axis_types = [
             'linear', 'log', 'datetime', 'categorical', 'density'
         ]
-        valid_y_axis_types = ['linear', 'log', 'categorical', 'density']
+        valid_y_axis_types = ['linear', 'log', 'categorical', 'density','box']
         valid_second_y_axis_types = ['linear', 'log']
+
+
         if x_axis_type not in valid_x_axis_types:
             raise ValueError('x_axis_type must be one of {options}'.format(
                 options=valid_x_axis_types))
@@ -175,6 +178,7 @@ y_axis_type='{y_axis_type}')
             tools='save',
             # toolbar_location='right',
             active_drag=None)
+
         return figure
 
     def _add_subtitle_to_figure(self, subtitle_text=None):
@@ -347,7 +351,7 @@ y_axis_type='{y_axis_type}')
                     reversed(self.figure.legend[0].items))
         return self
 
-    def show(self, format='html'):
+    def show(self, type=None, source=None, format='html'):
         """Show the chart.
 
         Args:
@@ -366,9 +370,12 @@ y_axis_type='{y_axis_type}')
 
                 - 'svg': Output as SVG.
                 """
+
         self._set_toolbar_for_format(format)
 
-        if format == 'html':
+        if format == 'html' and type=="preMade":
+            return bokeh.io.show(source)
+        elif format == 'html' and type==None:
             return bokeh.io.show(self.figure)
         elif format == 'png':
             image = self._figure_to_png()
