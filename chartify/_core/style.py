@@ -291,10 +291,10 @@ class Style:
                 'font': 'helvetica',
             },
             'interval_plot': {
-                'space_between_bars': .25,
+                'space_between_bars': 5.60,
                 'margin': .05,
                 'bar_width': .9,
-                'space_between_categories': 1.15,
+                'space_between_categories': 0.25,
                 # Note each stem is drawn twice
                 'interval_end_stem_size': .1 / 2,
                 'interval_midpoint_stem_size': .03 / 2
