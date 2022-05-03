@@ -11,7 +11,7 @@ def bruh(string,num):
     for i, l in enumerate(column):
         yy[g == l] += i // 2
     df = pd.DataFrame(dict(score=yy, group=g))
-
+    print(df)
     # find the quartiles and IQR for each category
     groups = df.groupby('group')
     q1 = groups.quantile(q=0.25)
@@ -60,8 +60,8 @@ def bruh(string,num):
     p.ygrid.grid_line_color = "white"
     p.grid.grid_line_width = 2
     p.xaxis.major_label_text_font_size="16px"
-    return p.()
-
-p = bruh("abcdef",6)
+    return p
+list1 = ["bop","beep","bruh","brr","bufu","brurh"]
+p = bruh(list1,30)
 bokeh.io.show(p)
 

@@ -1533,9 +1533,17 @@ class PlotMixedTypeXY(BasePlot):
         vertical = self._chart.axes._vertical
         #Fixing label work
         df = data_frame.values
-        print(len(df[0][0]))
-        if len(df[0][0]) > 5:
-            data_frame.at[0, "fruit"] = "hi"
+        print(df[2][0])
+        df2 = data_frame.axes
+        axisV = df2[1][0]
+        dfLen = len(df)
+        for i in range(dfLen):
+            if len(df[i][0]) > 7 and len(df[i][0])<11:
+                data_frame.at[i,axisV] = df[i][0][:5] + "\n" + df[i][0][5:]
+            elif len(df[i][0]) <= 7:
+                pass
+            else:
+               raise ValueError("""Axis label too long, try 10 characters or less""")
 
         source, factors, _ = self._construct_source(
             data_frame,
