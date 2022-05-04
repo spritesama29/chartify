@@ -22,11 +22,15 @@ import bokeh.io
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from bokeh.palettes import Category20c
+
 from chartify._core.colors import Color, color_palettes
 from chartify._core.axes import NumericalYMixin, NumericalXMixin
 from bokeh.plotting import figure, show
 
 from scipy.stats.kde import gaussian_kde
+from bokeh.transform import cumsum
+from math import pi
 
 
 class BasePlot:
@@ -751,6 +755,26 @@ class PlotNumericDensityXY(BasePlot):
         p.grid.grid_line_width = 2
         p.xaxis.major_label_text_font_size = "16px"
         return p
+
+    def pie(self, theData, font):
+
+        data = pd.Series(theData).reset_index(name='value').rename(columns={'index': 'country'})
+        data['angle'] = data['value'] / data['value'].sum() * 2 * pi
+        data['color'] = Category20c[len(theData)]
+
+        p = figure(height=350, title="Pie Chart", toolbar_location=None,
+                   tools="hover", tooltips="@country: @value", x_range=(-0.5, 1.0))
+
+        p.wedge(x=0, y=1, radius=0.4,
+                start_angle=cumsum('angle', include_zero=True), end_angle=cumsum('angle'),
+                line_color="white", fill_color='color', legend_field='country', source=data)
+
+        p.axis.axis_label = None
+        p.axis.visible = False
+        p.grid.grid_line_color = None
+        p.legend.label_text_font = font
+
+        show(p)
 
     def histCumu(self,
                   data_frame,
@@ -1581,7 +1605,9 @@ class PlotMixedTypeXY(BasePlot):
                     to conform the categorical axis to.
             categorical_order_ascending (bool, optional): Sort order of the
                 categorical axis. Default False.
+
         """
+
         vertical = self._chart.axes._vertical
         #Fixing label work
         df = data_frame.values
@@ -1633,6 +1659,9 @@ class PlotMixedTypeXY(BasePlot):
                 line_color='white',
                 source=source,
                 fill_color=colors,
+
+
+
                 )
 
         else:
@@ -1647,6 +1676,7 @@ class PlotMixedTypeXY(BasePlot):
                 line_color='white',
                 source=source,
                 fill_color=colors,
+
                 )
 
         # Set legend defaults if there are multiple series.
