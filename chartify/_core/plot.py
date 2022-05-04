@@ -1585,7 +1585,6 @@ class PlotMixedTypeXY(BasePlot):
         vertical = self._chart.axes._vertical
         #Fixing label work
         df = data_frame.values
-        print(df[2][0])
         df2 = data_frame.axes
         axisV = df2[1][0]
         dfLen = len(df)
@@ -1729,15 +1728,17 @@ class PlotMixedTypeXY(BasePlot):
             'interval_midpoint_stem_size']
         spacing_variable = len(data_frame.values)
         if spacing_variable == 8:
-            SPACE_BETWEEN_CATEGORIES = .75
-
+            SPACE_BETWEEN_CATEGORIES = .9
+            MARGIN = .05
+            BAR_WIDTH = 1.19455
+            SPACE_BETWEEN_BARS = .109
 
         def bar_edges(index, category_number):
             """Return start, midpoint, end edge coordinates"""
             bar_num = index + 1
             start = (
                 bar_num * MARGIN + (bar_num - 1) * MARGIN + (bar_num - 1) *
-                (BAR_WIDTH) + SPACE_BETWEEN_BARS * (bar_num - 1) *
+                (BAR_WIDTH) + SPACE_BETWEEN_BARS * (bar_num - .3) *
                 SPACE_BETWEEN_CATEGORIES * (category_number - 1))
             midpoint = start + BAR_WIDTH /2
             end = start + BAR_WIDTH
