@@ -66,4 +66,4 @@ ch.plot.text_stacked(
     text_color='white'
 )
 
-ch.show('html')
+ch.show()
