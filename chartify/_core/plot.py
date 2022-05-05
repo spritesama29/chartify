@@ -700,7 +700,7 @@ class PlotNumericDensityXY(BasePlot):
     #                   set(inherited_public_methods))
 
     def box_plot(self, string, num):
-        # generate some synthetic time series for six different categories
+        # https://docs.bokeh.org/en/latest/docs/gallery/boxplot.html
         column = list(string)
         yy = num
         g = np.random.choice(column)
