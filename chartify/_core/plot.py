@@ -1871,7 +1871,8 @@ class PlotMixedTypeXY(BasePlot):
                     normalize=False,
                     stack_order=None,
                     categorical_order_by='values',
-                    categorical_order_ascending=False):
+                    categorical_order_ascending=False,
+                    font=''):
         """Plot stacked bar chart.
 
         Note:
@@ -1964,6 +1965,8 @@ class PlotMixedTypeXY(BasePlot):
                 )
 
         self._chart.style._apply_settings('legend')
+        if font != '':
+            self._chart.style._apply_settings('customFont', font=font)
         # Reverse order of vertical legends to ensure that the order
         # is consistent with the stack order.
         self._chart._reverse_vertical_legend = True
