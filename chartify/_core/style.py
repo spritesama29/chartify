@@ -426,10 +426,22 @@ class Style:
             else:
                 setattr(base_obj, attr, value)
 
-    def _apply_settings(self, key):
+    def _apply_settings(self, key, font=''):
         """Apply the specified bokeh settings"""
-        setting_values = self.settings[key]
-        self._apply_bokeh_settings(setting_values)
+
+        if font == '':
+            setting_values = self.settings[key]
+            self._apply_bokeh_settings(setting_values)
+        else:
+            setting_values = {
+                'figure.title.text_font': font,
+                'figure.legend.label_text_font': font,
+                'figure.xaxis.axis_label_text_font': font,
+                'figure.yaxis.axis_label_text_font': font
+
+            }
+
+            self._apply_bokeh_settings(setting_values)
 
     def _get_settings(self, key):
         """Return the values of the given settings key"""
