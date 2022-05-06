@@ -757,8 +757,9 @@ class PlotNumericDensityXY(BasePlot):
         return p
 
     def pie(self, theData, font):
+        # lots of credit to https://docs.bokeh.org/en/latest/docs/gallery/pie_chart.html
 
-        data = pd.Series(theData).reset_index(name='value').rename(columns={'index': 'country'})
+        data = pd.Series(theData). reset_index(name='value').rename(columns={'index': 'country'})
         data['angle'] = data['value'] / data['value'].sum() * 2 * pi
         data['color'] = Category20c[len(theData)]
 
